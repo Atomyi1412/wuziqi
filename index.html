@@ -85,7 +85,17 @@
           border-radius: 8px;
         }
       }
-      .grid { position: absolute; inset: 16px; cursor: pointer; z-index: 1; }
+      .grid { 
+        position: absolute; 
+        inset: 16px; 
+        cursor: pointer; 
+        z-index: 1;
+        /* 防止移动端触摸高亮 */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
       .grid canvas { width: 100%; height: 100%; display: block; pointer-events: none; }
       .pieces { position: absolute; inset: 16px; pointer-events: none; z-index: 3; }
       .piece {
@@ -260,6 +270,10 @@
 
         const handleBoardClick = (e) => {
           if (winner) return;
+          
+          // 防止移动端双重触发
+          e.preventDefault();
+          
           const rect = e.currentTarget.getBoundingClientRect();
           const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
           const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
@@ -282,6 +296,8 @@
                 setSkillsUsed(s => ({ ...s, [current]: { ...s[current], remove:true } }));
                 setSkillMode(null);
                 toast.show('棋子被丢进了什刹海');
+                // 技能使用后切换回合
+                setCurrent(other);
               }
               return;
             }
@@ -290,6 +306,8 @@
                 placePiece(row, col, current);
                 setSkillsUsed(s => ({ ...s, [current]: { ...s[current], add:true } }));
                 setSkillMode(null);
+                // 技能使用后切换回合
+                setCurrent(other);
               }
               return;
             }
@@ -310,6 +328,8 @@
                   });
                   setSkillsUsed(s => ({ ...s, [current]: { ...s[current], swap:true } }));
                   setSkillMode(null);
+                  // 技能使用后切换回合
+                  setCurrent(other);
                 }
                 return;
               }
@@ -466,7 +486,7 @@
               </div>
               <div className="board-wrap">
                 <div className="board">
-                  <div className="grid" onClick={handleBoardClick} onTouchStart={(e)=>{ const t=e.touches[0]; handleBoardClick({ currentTarget:e.currentTarget, clientX:t.clientX, clientY:t.clientY }); }}>
+                  <div className="grid" onClick={handleBoardClick}>
                     <canvas ref={canvasRef}/>
                   </div>
                   <div className="hint">
