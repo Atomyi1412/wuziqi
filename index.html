@@ -10,27 +10,27 @@
     <link rel="stylesheet" href="styles.css" />
     <style>
       :root {
-        --bg-gradient: radial-gradient(1200px 800px at 10% 10%, #1f2937, #0b1020 60%, #050914);
-        --card-bg: rgba(255,255,255,0.06);
-        --card-border: rgba(255,255,255,0.12);
-        --accent: #7c3aed;
+        --bg-gradient: radial-gradient(1400px 900px at 20% 0%, #f5f7fb, #eef2f7 55%, #e9edf5);
+        --surface: #ffffff;
+        --card-bg: #ffffff;
+        --card-border: rgba(15,23,42,0.12);
+        --accent: #0f172a;
         --accent-2: #06b6d4;
         --win: #22c55e;
         --lose: #ef4444;
-        --text: #e5e7eb;
-        --muted: #94a3b8;
-        --grid: #334155;
+        --text: #0f172a;
+        --muted: #475569;
+        --grid: #cbd5e1;
         --black: #0f172a;
         --white: #e5e7eb;
-        --shadow: 0 10px 30px rgba(0,0,0,0.25);
+        --shadow: 0 12px 30px rgba(0,0,0,0.12);
       }
       html, body { height: 100%; }
       body {
         margin: 0;
-        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        font-family: Inter, -apple-system, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
         color: var(--text);
-        background: linear-gradient(120deg, #0b1020, #0a0f1e), var(--bg-gradient);
-        background-blend-mode: overlay;
+        background: var(--bg-gradient);
         min-height: 100vh;
         display: grid;
         place-items: center;
@@ -42,6 +42,8 @@
         grid-template-columns: 1fr 360px;
         gap: 20px;
       }
+      .container.start { grid-template-columns: 1fr; width: min(980px, 95vw); }
+      .container.normal { grid-template-columns: 1fr; }
       @media (max-width: 980px) {
         .container { grid-template-columns: 1fr; }
       }
@@ -50,7 +52,6 @@
         border: 1px solid var(--card-border);
         border-radius: 16px;
         box-shadow: var(--shadow);
-        backdrop-filter: saturate(120%) blur(8px);
       }
       .header {
         display: flex;
@@ -59,23 +60,32 @@
         padding: 16px 20px;
         border-bottom: 1px solid var(--card-border);
       }
+      .header .left { display: flex; align-items: center; gap: 12px; }
+      .icon-btn { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:999px; border:1px solid var(--card-border); background: #ffffff; color: var(--text); cursor:pointer; transition: background .2s ease, border-color .2s ease, transform .1s ease, color .2s ease; }
+      .icon-btn svg { width:20px; height:20px; }
+      .icon-btn:hover { background: rgba(124,58,237,0.12); color: var(--accent); border-color: rgba(124,58,237,0.45); }
+      .icon-btn:active { transform: translateY(1px); }
+      .icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(124,58,237,0.5); }
       .title {
         font-weight: 700;
         letter-spacing: 0.5px;
         display: flex; gap: 10px; align-items: center;
+        color: var(--text);
+        background: none;
+        -webkit-text-fill-color: var(--text);
       }
       .badge { padding: 6px 10px; border-radius: 999px; font-size: 12px; color: #0a0f1e; }
-      .badge.black { background: #facc15; }
-      .badge.white { background: #a7f3d0; }
-      .board-wrap { padding: 16px; }
+      .badge.black { background: #fde68a; }
+      .badge.white { background: #d1fae5; }
+      .board-wrap { padding: 20px; }
       .board {
         aspect-ratio: 1 / 1;
-        max-width: 720px;
+        max-width: 740px;
         width: 100%;
         margin: 0 auto;
-        background: linear-gradient(180deg, #e6c792, #c9a86a);
-        border-radius: 12px;
-        box-shadow: inset 0 0 0 2px rgba(0,0,0,0.2), var(--shadow);
+        background: linear-gradient(180deg, #f1e4c8, #e0c991);
+        border-radius: 16px;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12), var(--shadow);
         position: relative;
         overflow: hidden;
       }
@@ -97,6 +107,18 @@
         user-select: none;
       }
       .grid canvas { width: 100%; height: 100%; display: block; pointer-events: none; }
+      /* 按钮（苹果风） */
+      .btn { padding:10px 14px; border-radius:12px; border:1px solid var(--card-border); background:#ffffff; color: var(--text); cursor:pointer; transition: .2s ease; }
+      .btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
+      .btn:active { transform: translateY(0); }
+      /* 变体按钮采用柔和浅色填充与细边 */
+      .btn.accent { background: #eef2ff; color: #1f2937; border-color: #c7d2fe; }
+      .btn.success { background: #dcfce7; color: #14532d; border-color: #bbf7d0; }
+      .btn.danger { background: #fee2e2; color: #7f1d1d; border-color: #fecaca; }
+      /* 模式选择卡片留白 */
+      .start-wrap .mode-choices { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .start-wrap .mode-card { background: var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding: 16px; box-shadow: var(--shadow); }
+      .start-wrap .desc { color: var(--muted); }
       .pieces { position: absolute; inset: 16px; pointer-events: none; z-index: 3; }
       .piece {
         position: absolute;
@@ -118,9 +140,9 @@
       .stone {
         width: 100%; height: 100%;
         border-radius: 50%;
-        box-shadow: 0 8px 18px rgba(0,0,0,0.35), inset 0 -4px 8px rgba(0,0,0,0.35), inset 0 4px 10px rgba(255,255,255,0.35);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.28), inset 0 -3px 7px rgba(0,0,0,0.28), inset 0 4px 10px rgba(255,255,255,0.35);
         transition: transform 0.18s ease, box-shadow 0.2s ease;
-        border: 1px solid rgba(0,0,0,0.35);
+        border: 1px solid rgba(0,0,0,0.25);
       }
       .stone.black { background: radial-gradient(circle at 35% 30%, #374151, #0b0f1a 70%); }
       .stone.white { background: radial-gradient(circle at 40% 35%, #f3f4f6, #cbd5e1 70%); }
@@ -175,64 +197,74 @@
       .controls { padding: 16px; display: grid; gap: 12px; }
       .row { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
       .btn {
-        padding: 10px 14px; border-radius: 10px; border: 1px solid var(--card-border);
-        background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--card-border);
+        background: #ffffff;
         color: var(--text);
-        cursor: pointer; transition: all .18s ease; font-weight: 600; letter-spacing: .2px;
+        cursor: pointer;
+        transition: transform .18s ease, filter .18s ease;
+        font-weight: 600;
+        letter-spacing: .2px;
       }
-      .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+      .btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
       .btn:disabled { opacity: .45; cursor: not-allowed; }
-      .accent { border-color: rgba(124,58,237,.5); background: linear-gradient(180deg, rgba(124,58,237,.3), rgba(124,58,237,.1)); }
-      .danger { border-color: rgba(239,68,68,.45); background: linear-gradient(180deg, rgba(239,68,68,.25), rgba(239,68,68,.08)); }
-      .success { border-color: rgba(34,197,94,.45); background: linear-gradient(180deg, rgba(34,197,94,.25), rgba(34,197,94,.08)); }
+      .btn.accent { background: #eef2ff; color: #1f2937; border-color: #c7d2fe; }
+      .btn.danger { background: #fee2e2; color: #7f1d1d; border-color: #fecaca; }
+      .btn.success { background: #dcfce7; color: #14532d; border-color: #bbf7d0; }
       .panel { padding: 16px; }
       .status { font-family: JetBrains Mono, monospace; color: var(--muted); font-size: 13px; }
       .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .skill-card { padding: 12px; border-radius: 12px; border: 1px dashed var(--card-border); background: rgba(255,255,255,0.10); }
+      .skill-card { padding: 12px; border-radius: 12px; border: 1px solid var(--card-border); background: #ffffff; }
       .skill-card h4 { margin: 6px 0; font-size: 14px; }
       .count { font-size: 12px; color: var(--muted); }
       .footer { padding: 10px 16px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
-      .link { color: #93c5fd; text-decoration: none; }
-      .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: grid; place-items: center; }
-      .modal { width: min(720px, 92vw); background: rgba(17,24,39,0.90); border: 1px solid rgba(255,255,255,0.20); border-radius: 18px; box-shadow: var(--shadow); }
+      .link { color: #0ea5e9; text-decoration: none; }
+      .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,1); display: grid; place-items: center; z-index: 9998; }
+      .modal { width: min(720px, 92vw); background: #ffffff; border: 1px solid var(--card-border); border-radius: 18px; box-shadow: var(--shadow); z-index: 9999; }
       .modal .content { padding: 16px 18px; }
       .modal h3 { margin: 0; }
       .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.7); color: #fff; padding: 10px 14px; border-radius: 999px; box-shadow: var(--shadow); }
+      /* 开始界面样式 */
+      .start-wrap { max-width: 980px; margin: 48px auto; padding: 20px; }
+      .mode-choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; align-items: stretch; }
+      .mode-card { padding: 18px; border-radius: 16px; border: 1px solid var(--card-border); background: #ffffff; box-shadow: var(--shadow); display: flex; flex-direction: column; min-height: 220px; }
+      .mode-card h3 { margin: 0 0 8px 0; }
+      .mode-card .desc { color: var(--muted); font-size: 14px; margin-bottom: 12px; }
+      .mode-card .actions { margin-top: auto; display: flex; gap: 10px; }
+      .form { padding: 18px; border-radius: 16px; border: 1px dashed var(--card-border); }
+      .form-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+      .form-row input[type="text"] { flex:1; padding:8px 10px; border-radius:10px; border:1px solid var(--card-border); background: rgba(255,255,255,0.06); color: var(--text); }
+      .form-row input[type="color"] { width:42px; height:32px; padding:0; border:none; background: transparent; }
+      .color-dot { display:inline-block; width:12px; height:12px; border-radius:999px; margin-left:8px; border:1px solid rgba(255,255,255,0.35); vertical-align:middle; }
       
-      /* 大字报样式的当前玩家显示 */
+      /* 当前玩家横幅（柔和苹果风） */
       .current-player-banner {
         text-align: center;
         margin: 20px 0;
         padding: 16px 24px;
-        background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.15));
-        border: 2px solid rgba(124, 58, 237, 0.3);
+        background: #ffffff;
+        border: 1px solid var(--card-border);
         border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(124, 58, 237, 0.2);
+        box-shadow: var(--shadow);
       }
-      
       .player-turn {
-        font-size: 28px;
+        font-size: 22px;
         font-weight: 700;
-        color: #ffffff;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-        letter-spacing: 1px;
-        animation: playerTurnPulse 2s ease-in-out infinite;
+        color: var(--text);
+        letter-spacing: .5px;
       }
-      
       .winner-banner {
-        font-size: 32px;
+        font-size: 24px;
         font-weight: 800;
-        color: #fbbf24;
-        text-shadow: 0 2px 12px rgba(251, 191, 36, 0.6);
-        letter-spacing: 1.5px;
-        animation: winnerGlow 1.5s ease-in-out infinite alternate;
+        color: var(--accent);
+        letter-spacing: 1px;
       }
-      
       .frozen-notice {
         display: block;
-        font-size: 16px;
-        color: #60a5fa;
-        margin-top: 8px;
+        font-size: 14px;
+        color: var(--muted);
+        margin-top: 6px;
         font-weight: 500;
       }
       
@@ -258,22 +290,15 @@
       
       /* 响应式设计 */
       @media (max-width: 768px) {
+        .mode-choices { grid-template-columns: 1fr; }
         .current-player-banner {
           margin: 16px 0;
           padding: 12px 16px;
         }
         
-        .player-turn {
-          font-size: 22px;
-        }
-        
-        .winner-banner {
-          font-size: 24px;
-        }
-        
-        .frozen-notice {
-          font-size: 14px;
-        }
+        .player-turn { font-size: 20px; }
+        .winner-banner { font-size: 22px; }
+        .frozen-notice { font-size: 13px; }
       }
       
       @media (max-width: 480px) {
@@ -343,7 +368,7 @@
       function calcWin(board, lastRow, lastCol) {
         if (lastRow == null || lastCol == null) return null;
         const color = board[lastRow][lastCol];
-        if (!color) return null;
+        if (color == null) return null;
         const dirs = [[1,0],[0,1],[1,1],[1,-1]];
         const inBounds = (r,c)=> r>=0 && r<SIZE && c>=0 && c<SIZE;
         for (const [dr,dc] of dirs) {
@@ -358,6 +383,26 @@
       }
 
       function App(){
+        const [gameMode, setGameMode] = React.useState(null); // null -> start, 'skill' | 'normal'
+        const [players, setPlayers] = React.useState([]); // 普通模式玩家数组 {id,name,color}
+        const [currentIndex, setCurrentIndex] = React.useState(0);
+        const defaultColors = ['#111827','#f3f4f6','#e11d48','#2563eb','#10b981','#f59e0b','#8b5cf6','#0ea5e9'];
+        const [normalConfig, setNormalConfig] = React.useState({
+          count: 2,
+          players: [ { name:'玩家1', color:'#111827' }, { name:'玩家2', color:'#f3f4f6' } ]
+        });
+        const [showNormalConfig, setShowNormalConfig] = React.useState(false);
+        const ensureConfigCount = React.useCallback((n)=>{
+          setNormalConfig(prev=>{
+            let arr = prev.players.slice(0, n);
+            while(arr.length < n){
+              const i = arr.length;
+              arr.push({ name:`玩家${i+1}`, color: defaultColors[i % defaultColors.length] });
+            }
+            return { ...prev, count:n, players: arr };
+          });
+        },[]);
+
         const [board, setBoard] = React.useState(createEmptyBoard);
         const [current, setCurrent] = React.useState('black');
         const [names] = React.useState({ black: '技能五', white: '子祺' });
@@ -392,7 +437,7 @@
         };
 
         const handleBoardClick = (e) => {
-          if (winner) return;
+          if (winner != null) return;
           
           // 防止移动端双重触发
           e.preventDefault();
@@ -405,6 +450,20 @@
           let row = Math.round(y / cs);
           col = Math.max(0, Math.min(SIZE-1, col));
           row = Math.max(0, Math.min(SIZE-1, row));
+
+          // 普通模式：仅落子与轮换，不含技能/冻结
+          if (gameMode === 'normal') {
+            if (board[row][col]) return;
+            const pid = currentIndex; // 用玩家索引标记棋盘
+            setBoard(prev=>{
+              const next = prev.map(r=>r.slice());
+              next[row][col] = pid;
+              return next;
+            });
+            setLastMove({ row, col });
+            setCurrentIndex(i => (i + 1) % players.length);
+            return;
+          }
 
           // Skill targeting mode
           if (skillMode) {
@@ -489,7 +548,7 @@
           }
 
           // Freeze skip check
-          if (frozen[current]) {
+          if (gameMode === 'skill' && frozen[current]) {
             setFrozen(prev => ({ ...prev, [current]: false }));
             setCurrent(c => c === 'black' ? 'white' : 'black');
             return;
@@ -498,45 +557,70 @@
           // Normal placement
           if (board[row][col] || winner) return; // 如果位置已占用或游戏结束，直接返回
           
-          setBoard(prev => {
-            const next = prev.map(r=>r.slice());
-            next[row][col] = current;
-            return next;
-          });
-          setLastMove({ row, col });
-          const nextTurn = current === 'black' ? 'white' : 'black';
-          if (frozen[nextTurn]) {
-            // auto-skip opponent: clear freeze and keep current turn
-            setFrozen(prev => ({ ...prev, [nextTurn]: false }));
-            // 保持当前玩家继续下棋，不切换
-          } else {
-            setCurrent(nextTurn);
+          if (gameMode === 'skill') {
+            setBoard(prev => {
+              const next = prev.map(r=>r.slice());
+              next[row][col] = current;
+              return next;
+            });
+            setLastMove({ row, col });
+            const nextTurn = current === 'black' ? 'white' : 'black';
+            if (frozen[nextTurn]) {
+              // auto-skip opponent: clear freeze and keep current turn
+              setFrozen(prev => ({ ...prev, [nextTurn]: false }));
+              // 保持当前玩家继续下棋，不切换
+            } else {
+              setCurrent(nextTurn);
+            }
           }
         };
 
         React.useEffect(()=>{
           if (lastMove) {
             const w = calcWin(board, lastMove.row, lastMove.col);
-            if (w) setWinner(w);
+            if (w != null) setWinner(w);
           }
         }, [board, lastMove]);
 
         React.useEffect(()=>{
-          if (winner) {
-            const name = winner === 'black' ? names.black : names.white;
+          if (winner != null) {
+            const name = gameMode === 'skill'
+              ? (winner === 'black' ? names.black : names.white)
+              : (players[winner]?.name || '玩家');
             toast.show(`${name} 获胜！恭喜连成五子！`);
           }
-        }, [winner]);
+        }, [winner, gameMode, players]);
 
         const reset = () => {
           setBoard(createEmptyBoard());
-          setCurrent('black');
-          setFrozen({ black:false, white:false });
-          setSkillsUsed({ black: { remove:false, freeze:false, instant:false, swap:false, add:false }, white: { remove:false, freeze:false, instant:false, swap:false, add:false } });
           setWinner(null);
           setLastMove(null);
-          setSkillMode(null);
           setSelectedPiece(null);
+          if (gameMode === 'skill') {
+            setCurrent('black');
+            setFrozen({ black:false, white:false });
+            setSkillsUsed({ black: { remove:false, freeze:false, instant:false, swap:false, add:false }, white: { remove:false, freeze:false, instant:false, swap:false, add:false } });
+            setSkillMode(null);
+          } else if (gameMode === 'normal') {
+            setCurrentIndex(0);
+          }
+        };
+
+        const startSkillGame = () => {
+          setGameMode('skill');
+          reset();
+        };
+        const startNormalGame = () => {
+          const cfg = normalConfig.players.filter(Boolean).slice(0, normalConfig.count);
+          if (cfg.length < 2) { toast.show('普通模式至少需要2位玩家'); return; }
+          const ps = cfg.map((p,i)=>({ ...p, id:i }));
+          setPlayers(ps);
+          setGameMode('normal');
+          setBoard(createEmptyBoard());
+          setWinner(null);
+          setLastMove(null);
+          setCurrentIndex(0);
+          setSkillMode(null);
         };
 
         // Skills
@@ -586,13 +670,15 @@
         for (let r=0;r<SIZE;r++) {
           for (let c=0;c<SIZE;c++) {
             const v = board[r][c];
-            if (!v) continue;
+            if (v == null) continue;
             const x = c * cs;
             const y = r * cs;
             const isSelected = selectedPiece && selectedPiece.r === r && selectedPiece.c === c;
+            const stoneClass = gameMode === 'skill' ? `stone ${v}${isSelected ? ' selected' : ''}` : `stone${isSelected ? ' selected' : ''}`;
+            const stoneStyle = gameMode === 'normal' ? { background: players[v]?.color || '#ffffff' } : undefined;
             pieces.push(
               <div key={`${r}-${c}`} className="piece" style={{ left: x, top: y }}>
-                <div className={`stone ${v}${isSelected ? ' selected' : ''}`} />
+                <div className={stoneClass} style={stoneStyle} />
               </div>
             );
           }
@@ -629,13 +715,60 @@
         );
 
         return (
-          <div className="container">
+          <div className={`container${!gameMode ? ' start' : gameMode === 'normal' ? ' normal' : ''}`}>
+            {!gameMode && (
+              <div className="start-wrap">
+                <div className="header" style={{marginBottom: '12px'}}>
+                  <div className="title">选择游戏模式</div>
+                </div>
+                <div className="mode-choices">
+                  <div className="mode-card">
+                    <h3>普通五子棋模式</h3>
+                    <p className="desc">自由设置玩家数量、名称与棋子颜色。</p>
+                    <div className="actions">
+                      <button className="btn success" onClick={()=>setShowNormalConfig(true)}>配置并开始</button>
+                    </div>
+                  </div>
+                  <div className="mode-card">
+                    <h3>技能五子棋模式</h3>
+                    <p className="desc">包含技能面板与特殊规则，当前页面的玩法。</p>
+                    <div className="actions">
+                      <button className="btn accent" onClick={startSkillGame}>进入技能模式</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            {gameMode && (
             <div className="card">
               <div className="header">
-                <div className="title">
-                  <span>技能五 vs 子祺</span>
-                  <span className="badge black">黑：技能五</span>
-                  <span className="badge white">白：子祺</span>
+                <div className="left">
+                  <button className="icon-btn" title="返回模式选择" aria-label="返回模式选择" onClick={()=>{ setGameMode(null); setShowRules(false); setShowNormalConfig(false); }}>
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M3 10.5L12 3l9 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M5 10.5v9h14v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M10 19.5v-5h4v5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <div className="title">
+                  {gameMode === 'skill' ? (
+                    <>
+                      <span>技能五 vs 子祺</span>
+                      <span className="badge black">黑：技能五</span>
+                      <span className="badge white">白：子祺</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>普通模式</span>
+                      {players.map((p)=> (
+                        <span key={`h-${p.id}`} className="badge" style={{borderColor:'rgba(255,255,255,0.25)'}}>
+                          {p.name}
+                          <span className="color-dot" style={{background:p.color}}></span>
+                        </span>
+                      ))}
+                    </>
+                  )}
+                  </div>
                 </div>
                 <div className="row">
                   <button className="btn" onClick={()=>setShowRules(true)}>规则说明</button>
@@ -644,14 +777,22 @@
               </div>
               {/* 大字报样式的当前玩家显示 */}
               <div className="current-player-banner">
-                {winner ? (
+                {winner != null ? (
                   <div className="winner-banner">
-                    🎉 胜者：{winner === 'black' ? names.black : names.white} 🎉
+                    {gameMode === 'skill' ? (
+                      <>🎉 胜者：{winner === 'black' ? names.black : names.white} 🎉</>
+                    ) : (
+                      <>🎉 胜者：{players[winner]?.name || '玩家'} 🎉</>
+                    )}
                   </div>
                 ) : (
                   <div className="player-turn">
-                    轮到：{current === 'black' ? `${names.black}（黑棋）` : `${names.white}（白棋）`}
-                    {frozen[current] && <span className="frozen-notice">（本回合冻结，自动跳过）</span>}
+                    {gameMode === 'skill' ? (
+                      <>轮到：{current === 'black' ? `${names.black}（黑棋）` : `${names.white}（白棋）`}
+                        {frozen[current] && <span className="frozen-notice">（本回合冻结，自动跳过）</span>}</>
+                    ) : (
+                      <>轮到：{players[currentIndex]?.name || '-'}<span className="frozen-notice">（普通模式：无技能）</span></>
+                    )}
                   </div>
                 )}
               </div>
@@ -674,14 +815,17 @@
                 <div className="status">最近落子：{lastMove ? `${lastMove.row+1}, ${lastMove.col+1}` : '-'}</div>
               </div>
             </div>
+            )}
 
-            <div className="card">
-              <div className="panel">
-                <h3>技能面板</h3>
-                <p className="status">每种技能每局仅可使用一次。当前玩家：{current==='black'?names.black:names.white}</p>
-                {skillsPanel}
+            {gameMode === 'skill' && (
+              <div className="card">
+                <div className="panel">
+                  <h3>技能面板</h3>
+                  <p className="status">每种技能每局仅可使用一次。当前玩家：{current==='black'?names.black:names.white}</p>
+                  {skillsPanel}
+                </div>
               </div>
-            </div>
+            )}
 
             {showRules && (
               <div className="modal-backdrop" onClick={()=>setShowRules(false)}>
@@ -707,7 +851,42 @@
               </div>
             )}
 
-            {winner && (
+            {showNormalConfig && (
+              <div className="modal-backdrop" onClick={()=>setShowNormalConfig(false)}>
+                <div className="modal" onClick={(e)=>e.stopPropagation()}>
+                  <div className="header">
+                    <div className="title">普通模式配置</div>
+                    <div className="row">
+                      <button className="btn" onClick={()=>setShowNormalConfig(false)}>取消</button>
+                      <button className="btn success" onClick={()=>{ startNormalGame(); setShowNormalConfig(false); }}>开始对局</button>
+                    </div>
+                  </div>
+                  <div className="content">
+                    <div className="form">
+                      <div className="form-row">
+                        <label>玩家人数（≥2）：</label>
+                        <input type="number" min={2} value={normalConfig.count} onChange={(e)=>ensureConfigCount(Math.max(2, Number(e.target.value)||2))} />
+                      </div>
+                      {normalConfig.players.map((p,i)=> (
+                        <div key={`cfgm-${i}`} className="form-row">
+                          <span>玩家{i+1}：</span>
+                          <input type="text" value={p.name} onChange={(e)=>{
+                            const v = e.target.value;
+                            setNormalConfig(prev=>{ const arr = prev.players.slice(); arr[i] = { ...arr[i], name: v }; return { ...prev, players: arr }; });
+                          }} />
+                          <input type="color" value={p.color} onChange={(e)=>{
+                            const v = e.target.value;
+                            setNormalConfig(prev=>{ const arr = prev.players.slice(); arr[i] = { ...arr[i], color: v }; return { ...prev, players: arr }; });
+                          }} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {winner != null && (
               <div className="modal-backdrop" onClick={()=>{}}>
                 <div className="modal" onClick={(e)=>e.stopPropagation()}>
                   <div className="header">
@@ -715,7 +894,9 @@
                     <button className="btn" onClick={reset}>重新开始</button>
                   </div>
                   <div className="content">
-                    <h3 style={{marginTop:0}}>胜者：{winner === 'black' ? names.black : names.white}</h3>
+                    <h3 style={{marginTop:0}}>
+                      胜者：{gameMode === 'skill' ? (winner === 'black' ? names.black : names.white) : (players[winner]?.name || '玩家')}
+                    </h3>
                     <p>恭喜达成连续五子！可点击右上角“重新开始”再战一局。</p>
                   </div>
                 </div>

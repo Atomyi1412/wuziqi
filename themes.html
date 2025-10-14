@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>配色预览 - 五子棋</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root { --shadow: 0 10px 30px rgba(0,0,0,0.12); }
+      html, body { height: 100%; }
+      body {
+        margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica, Arial;
+        background: #f6f7fb; color: #0f172a; display: grid; place-items: center; min-height: 100vh;
+      }
+      .wrap { width: min(1200px, 95vw); }
+      .topbar { display:flex; justify-content:space-between; align-items:center; margin: 24px 0; }
+      .title { font-weight:700; letter-spacing:.5px; }
+      .back { display:inline-flex; align-items:center; gap:8px; color:#334155; text-decoration:none; }
+      .grid { display:grid; grid-template-columns: repeat(5, 1fr); gap:16px; }
+      @media (max-width: 1200px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+      @media (max-width: 780px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+      .preview-card { border-radius:16px; overflow:hidden; box-shadow: var(--shadow); border:1px solid rgba(0,0,0,0.08); }
+      .sample { padding:16px; }
+      .sample .header { display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid var(--card-border); }
+      .sample .badge { padding:6px 10px; border-radius:999px; font-size:12px; }
+      .row { display:flex; gap:8px; align-items:center; }
+      .btn { padding:8px 12px; border-radius:10px; border:1px solid var(--card-border); background: var(--btn-bg); color: var(--btn-text); cursor:pointer; transition: .2s ease; }
+      .btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+      .card { margin-top:14px; border:1px solid var(--card-border); border-radius:12px; background: var(--card-bg); padding:12px; }
+      .swatch { display:flex; gap:8px; margin-top:10px; }
+      .dot { width:18px; height:18px; border-radius:50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08); }
+
+      /* Aurora Light */
+      .theme-aurora { --bg: linear-gradient(140deg, #eef2ff, #e0f2fe); --text:#0f172a; --muted:#475569; --accent:#7c3aed; --accent-2:#06b6d4; --card-bg:#ffffff; --card-border: rgba(0,0,0,0.10); --btn-bg:#f8fafc; --btn-text:#0f172a; }
+      .theme-aurora .hero { background: var(--bg); padding:16px; }
+
+      /* Glacier Minimal — 高级简笔画 */
+      .theme-minimal { --bg:#fbfbfc; --text:#0b0f1a; --muted:#4b5563; --accent:#111827; --accent-2:#6b7280; --card-bg:#ffffff; --card-border: rgba(15,23,42,0.12); --btn-bg:#ffffff; --btn-text:#0b0f1a; }
+      .theme-minimal .sample { background: #ffffff; }
+      .theme-minimal .line-icon { width:22px; height:22px; }
+
+      /* Sakura Pastel */
+      .theme-sakura { --bg: linear-gradient(120deg,#fff1f2,#fef3c7); --text:#1f2937; --muted:#6b7280; --accent:#f472b6; --accent-2:#14b8a6; --card-bg:#ffffff; --card-border: rgba(0,0,0,0.08); --btn-bg:#fff7f9; --btn-text:#1f2937; }
+
+      /* Emerald Fresh */
+      .theme-emerald { --bg: linear-gradient(135deg,#ecfdf5,#eff6ff); --text:#042f2e; --muted:#0f766e; --accent:#10b981; --accent-2:#2563eb; --card-bg:#ffffff; --card-border: rgba(0,0,0,0.10); --btn-bg:#f0fdfa; --btn-text:#064e3b; }
+
+      /* Solar Bright */
+      .theme-solar { --bg: linear-gradient(135deg,#fff7e6,#e0fbff); --text:#1f2937; --muted:#475569; --accent:#fb923c; --accent-2:#22d3ee; --card-bg:#ffffff; --card-border: rgba(0,0,0,0.10); --btn-bg:#fff8f0; --btn-text:#1f2937; }
+
+      .preview-card .sample { color: var(--text); }
+      .preview-card .sample .badge { background: var(--accent-2); color: white; }
+      .preview-card .btn.primary { background: var(--accent); color: white; border-color: transparent; }
+      .preview-card .swatch .dot:nth-child(1){ background: var(--accent); }
+      .preview-card .swatch .dot:nth-child(2){ background: var(--accent-2); }
+      .preview-card .swatch .dot:nth-child(3){ background: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="topbar">
+        <div class="title">配色预览（5 套方案）</div>
+        <a class="back" href="/index.html" title="返回游戏">
+          <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M3 10.5L12 3l9 7.5M5 10.5v9h14v-9M10 19.5v-5h4v5" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          返回游戏
+        </a>
+      </div>
+      <div class="grid">
+        <div class="preview-card theme-aurora">
+          <div class="sample">
+            <div class="header">
+              <div class="row"><strong>Aurora Light</strong><span class="badge">清亮渐变</span></div>
+              <div class="row"><button class="btn">次要</button><button class="btn primary">主要</button></div>
+            </div>
+            <div class="card">卡片与内容区域，建议用于高级对战信息。</div>
+            <div class="swatch"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          </div>
+        </div>
+
+        <div class="preview-card theme-minimal">
+          <div class="sample">
+            <div class="header">
+              <div class="row"><strong>Glacier Minimal</strong><span class="badge" style="background:#e5e7eb; color:#111827;">简笔风</span></div>
+              <div class="row"><button class="btn">次要</button><button class="btn primary" style="background:#111827">主要</button></div>
+            </div>
+            <div class="card" style="border:1px solid #d1d5db">以留白与细线为主，强调轻层次与清晰信息。</div>
+            <div class="swatch"><div class="dot" style="background:#111827"></div><div class="dot" style="background:#6b7280"></div><div class="dot" style="background:#e5e7eb"></div></div>
+          </div>
+        </div>
+
+        <div class="preview-card theme-sakura">
+          <div class="sample">
+            <div class="header">
+              <div class="row"><strong>Sakura Pastel</strong><span class="badge">柔和浅色</span></div>
+              <div class="row"><button class="btn">次要</button><button class="btn primary">主要</button></div>
+            </div>
+            <div class="card">温柔粉与薄荷蓝的搭配，适合轻松氛围。</div>
+            <div class="swatch"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          </div>
+        </div>
+
+        <div class="preview-card theme-emerald">
+          <div class="sample">
+            <div class="header">
+              <div class="row"><strong>Emerald Fresh</strong><span class="badge">自然清新</span></div>
+              <div class="row"><button class="btn">次要</button><button class="btn primary">主要</button></div>
+            </div>
+            <div class="card">绿色与蓝色为主的清爽组合，信息对比明显。</div>
+            <div class="swatch"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          </div>
+        </div>
+
+        <div class="preview-card theme-solar">
+          <div class="sample">
+            <div class="header">
+              <div class="row"><strong>Solar Bright</strong><span class="badge">活力阳光</span></div>
+              <div class="row"><button class="btn">次要</button><button class="btn primary">主要</button></div>
+            </div>
+            <div class="card">橙与青的高活力配色，适合竞技与提示信息。</div>
+            <div class="swatch"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Preview: 应用主题到实际模式的展示 -->
+      <style>
+        .live-preview { margin: 24px 0 40px; border:1px solid rgba(0,0,0,0.08); border-radius:16px; box-shadow: var(--shadow); overflow:hidden; }
+        .live-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid var(--card-border); background: var(--card-bg); }
+        .live-title { font-weight:600; }
+        .live-tabs { display:flex; gap:8px; }
+        .tab { padding:8px 12px; border-radius:10px; border:1px solid var(--card-border); background: var(--btn-bg); color: var(--btn-text); cursor:pointer; }
+        .tab.active { background: var(--accent); color: #fff; border-color: transparent; }
+        .live-body { background: var(--bg); padding:16px; }
+        .mock-wrap { display:none; }
+        .mock-wrap.active { display:block; }
+        /* start mock */
+        .mock-start .mode-choices { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+        .mock-start .mode-card { background: var(--card-bg); border:1px solid var(--card-border); border-radius:12px; padding:12px; }
+        .mock-start .mode-card .row { display:flex; justify-content:flex-end; }
+        /* normal mock */
+        .mock-normal .card { background: var(--card-bg); border:1px solid var(--card-border); border-radius:12px; overflow:hidden; }
+        .mock-normal .header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--card-border); }
+        .mock-normal .badge { padding:4px 8px; border-radius:999px; font-size:12px; margin-left:6px; background: var(--accent-2); color: #fff; }
+        .mock-normal .board-mini { height:220px; border-radius:10px; background: linear-gradient(180deg,#e6c792,#c9a86a); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.12); margin: 12px; }
+        .mock-normal .footer { padding:10px 12px; border-top:1px solid var(--card-border); }
+        /* skill mock */
+        .mock-skill .layout { display:grid; grid-template-columns: 1fr 280px; gap:12px; }
+        .mock-skill .card { background: var(--card-bg); border:1px solid var(--card-border); border-radius:12px; overflow:hidden; }
+        .mock-skill .header { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid var(--card-border); }
+        .mock-skill .badge.black { background:#facc15; color:#0a0f1e; padding:4px 8px; border-radius:999px; margin-left:8px; }
+        .mock-skill .badge.white { background:#a7f3d0; color:#0a0f1e; padding:4px 8px; border-radius:999px; margin-left:6px; }
+        .mock-skill .board-mini { height:220px; border-radius:10px; background: linear-gradient(180deg,#e6c792,#c9a86a); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.12); margin: 12px; }
+        .mock-skill .panel { padding:12px; }
+        .mock-skill .skill-card { background: var(--btn-bg); border:1px solid var(--card-border); border-radius:10px; padding:8px; margin-bottom:8px; }
+        .apply-row { margin-top:10px; display:flex; justify-content:flex-end; }
+      </style>
+      <div class="live-preview theme-aurora">
+        <div class="live-header">
+          <div class="live-title">主题应用预览</div>
+          <div class="live-tabs">
+            <button class="tab active" data-mode="start">开始界面</button>
+            <button class="tab" data-mode="normal">普通模式</button>
+            <button class="tab" data-mode="skill">技能模式</button>
+          </div>
+        </div>
+        <div class="live-body">
+          <div class="mock-wrap mock-start active">
+            <div class="mode-choices">
+              <div class="mode-card">
+                <h4>普通五子棋模式</h4>
+                <p>自由设置玩家数量、名称与棋子颜色。</p>
+                <div class="row"><button class="btn primary">配置并开始</button></div>
+              </div>
+              <div class="mode-card">
+                <h4>技能五子棋模式</h4>
+                <p>包含技能面板与特殊规则，当前页面的玩法。</p>
+                <div class="row"><button class="btn primary">进入技能模式</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mock-wrap mock-normal">
+            <div class="card">
+              <div class="header">
+                <div><strong>普通模式</strong><span class="badge">玩家A</span><span class="badge">玩家B</span></div>
+                <div class="row"><button class="btn">规则说明</button><button class="btn">重新开始</button></div>
+              </div>
+              <div class="board-mini"></div>
+              <div class="footer">最近落子：-</div>
+            </div>
+          </div>
+
+          <div class="mock-wrap mock-skill">
+            <div class="layout">
+              <div class="card">
+                <div class="header">
+                  <div><strong>技能五 vs 子祺</strong><span class="badge black">黑：技能五</span><span class="badge white">白：子祺</span></div>
+                  <div class="row"><button class="btn">规则说明</button><button class="btn">重新开始</button></div>
+                </div>
+                <div class="board-mini"></div>
+              </div>
+              <div class="card">
+                <div class="panel">
+                  <h4>技能面板</h4>
+                  <div class="skill-card">飞沙走石：移除对手棋子</div>
+                  <div class="skill-card">静如止水：冻结一回合</div>
+                  <div class="skill-card">力拔山兮：直接获胜</div>
+                  <div class="skill-card">移形换影：交换一枚棋子</div>
+                  <div class="skill-card">神来之笔：额外落子</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // 模式切换
+        const tabs = document.querySelectorAll('.tab');
+        const wraps = document.querySelectorAll('.mock-wrap');
+        tabs.forEach(t=>{
+          t.addEventListener('click', ()=>{
+            tabs.forEach(x=>x.classList.remove('active'));
+            t.classList.add('active');
+            wraps.forEach(w=>w.classList.remove('active'));
+            document.querySelector('.mock-'+t.dataset.mode).classList.add('active');
+          })
+        });
+        // 应用到下方预览
+        const THEMES = ['theme-aurora','theme-minimal','theme-sakura','theme-emerald','theme-solar'];
+        document.querySelectorAll('.preview-card .sample').forEach(card=>{
+          const applyRow = document.createElement('div');
+          applyRow.className = 'apply-row';
+          const btn = document.createElement('button');
+          btn.className = 'btn';
+          btn.textContent = '应用到下方预览';
+          applyRow.appendChild(btn);
+          card.appendChild(applyRow);
+          const themeClass = card.parentElement.classList[1];
+          btn.addEventListener('click', ()=>{
+            const live = document.querySelector('.live-preview');
+            THEMES.forEach(c=>live.classList.remove(c));
+            live.classList.add(themeClass);
+          });
+        });
+      </script>
+    </div>
+  </body>
+  </html>
