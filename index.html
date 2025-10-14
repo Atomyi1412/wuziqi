@@ -343,14 +343,41 @@
               return;
             }
             if (skillMode.type === 'swap') {
-              if (skillMode.step !== 2) {
+              if (skillMode.step === 1) {
+                // 第一步：选择己方棋子
                 if (board[row][col] === current) {
-                  setSkillMode({ type:'swap', step:2, first:{ r:row, c:col } });
-                  setSelectedPiece({ r: row, c: col }); // 设置选中的棋子
-                  toast.show('已选中己方棋子，现在请选择要交换的对方棋子');
+                  // 检查是否点击的是已选中的棋子
+                  if (selectedPiece && selectedPiece.r === row && selectedPiece.c === col) {
+                    // 取消选中
+                    setSelectedPiece(null);
+                    toast.show('已取消选择，请重新选择己方棋子');
+                  } else {
+                    // 选中新的棋子（包括重新选择）
+                    setSkillMode({ type:'swap', step:2, first:{ r:row, c:col } });
+                    setSelectedPiece({ r: row, c: col }); // 设置选中的棋子
+                    toast.show('已重新选择，现在请选择对方棋子进行交换');
+                  }
                 }
                 return;
-              } else {
+              } else if (skillMode.step === 2) {
+                // 第二步：选择对方棋子进行交换；允许取消或改选己方棋子
+                // 点击己方棋子：取消或改选
+                if (board[row][col] === current) {
+                  // 点击同一个己方棋子：取消选中并回到第一步
+                  if (selectedPiece && selectedPiece.r === row && selectedPiece.c === col) {
+                    setSelectedPiece(null);
+                    setSkillMode({ type:'swap', step:1 });
+                    toast.show('已取消选择，请重新选择己方棋子');
+                    return;
+                  }
+                  // 点击其他己方棋子：改选为新的己方棋子，保持第二步状态
+                  setSelectedPiece({ r: row, c: col });
+                  setSkillMode({ type:'swap', step:2, first:{ r:row, c:col } });
+                  toast.show('已重新选择，现在请选择对方棋子进行交换');
+                  return;
+                }
+
+                // 点击对方棋子：执行交换
                 if (board[row][col] === other) {
                   const a = skillMode.first;
                   setBoard(prev => {
@@ -450,7 +477,7 @@
           if (skillsUsed[current].swap) return;
           setSkillMode({ type:'swap', step:1 });
           setSelectedPiece(null); // 清除之前的选中状态
-          toast.show('先选择己方棋子，再选择对方棋子');
+          toast.show('请选择己方棋子（可重新选择或点击已选中棋子取消）');
         };
 
         const useAdd = () => {
