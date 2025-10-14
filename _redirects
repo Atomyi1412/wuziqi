@@ -1,0 +1,3 @@
+# Netlify 重定向规则
+# 将所有路由重定向到 index.html，支持单页应用 (SPA)
+/*    /index.html   200

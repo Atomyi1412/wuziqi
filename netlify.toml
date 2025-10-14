@@ -1,0 +1,48 @@
+[build]
+  # 发布目录 - 当前目录包含所有静态文件
+  publish = "."
+  
+  # 由于是纯静态项目，不需要构建命令
+  command = ""
+
+[build.environment]
+  # Node.js 版本（虽然不需要构建，但设置以防万一）
+  NODE_VERSION = "18"
+
+# 网站设置
+[[headers]]
+  # 为所有路径设置安全头
+  for = "/*"
+  [headers.values]
+    # 启用 HTTPS 严格传输安全
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # 防止点击劫持
+    X-Frame-Options = "DENY"
+    # 防止 MIME 类型嗅探
+    X-Content-Type-Options = "nosniff"
+    # XSS 保护
+    X-XSS-Protection = "1; mode=block"
+    # 推荐人策略
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# 缓存设置
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# 重定向设置 - 确保所有路由都指向 index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
