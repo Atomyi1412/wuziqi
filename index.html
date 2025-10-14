@@ -295,9 +295,8 @@
                 });
                 setSkillsUsed(s => ({ ...s, [current]: { ...s[current], remove:true } }));
                 setSkillMode(null);
-                toast.show('棋子被丢进了什刹海');
-                // 技能使用后切换回合
-                setCurrent(other);
+                toast.show('棋子被丢进了什刹海，你可以再落子一次');
+                // 飞沙走石技能：移除棋子后不切换回合，当前玩家可以再落子一次
               }
               return;
             }
