@@ -79,6 +79,12 @@
         position: relative;
         overflow: hidden;
       }
+      @media (max-width: 768px) {
+        .board {
+          max-width: 90vw;
+          border-radius: 8px;
+        }
+      }
       .grid { position: absolute; inset: 16px; cursor: pointer; z-index: 1; }
       .grid canvas { width: 100%; height: 100%; display: block; pointer-events: none; }
       .pieces { position: absolute; inset: 16px; pointer-events: none; z-index: 3; }
@@ -88,6 +94,16 @@
         transform: translate(-50%, -50%);
         pointer-events: none;
         z-index: 3;
+      }
+      @media (max-width: 768px) {
+        .piece {
+          width: 20px; height: 20px;
+        }
+      }
+      @media (max-width: 480px) {
+        .piece {
+          width: 16px; height: 16px;
+        }
       }
       .stone {
         width: 100%; height: 100%;
@@ -104,6 +120,16 @@
         background: rgba(0,0,0,0.35);
         transform: translate(-50%, -50%);
         pointer-events: none;
+      }
+      @media (max-width: 768px) {
+        .hint-dot {
+          width: 8px; height: 8px;
+        }
+      }
+      @media (max-width: 480px) {
+        .hint-dot {
+          width: 6px; height: 6px;
+        }
       }
       .controls { padding: 16px; display: grid; gap: 12px; }
       .row { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
@@ -298,8 +324,9 @@
           }
 
           // Normal placement
+          if (board[row][col] || winner) return; // 如果位置已占用或游戏结束，直接返回
+          
           setBoard(prev => {
-            if (prev[row][col] || winner) return prev;
             const next = prev.map(r=>r.slice());
             next[row][col] = current;
             return next;
@@ -309,7 +336,7 @@
           if (frozen[nextTurn]) {
             // auto-skip opponent: clear freeze and keep current turn
             setFrozen(prev => ({ ...prev, [nextTurn]: false }));
-            setCurrent(current);
+            // 保持当前玩家继续下棋，不切换
           } else {
             setCurrent(nextTurn);
           }
