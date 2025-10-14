@@ -337,8 +337,8 @@
                 placePiece(row, col, current);
                 setSkillsUsed(s => ({ ...s, [current]: { ...s[current], add:true } }));
                 setSkillMode(null);
-                // 技能使用后切换回合
-                setCurrent(other);
+                toast.show('神来之笔已使用，你可以再落子一次');
+                // 神来之笔技能：放置棋子后不切换回合，当前玩家可以再落子一次
               }
               return;
             }
@@ -389,8 +389,8 @@
                   setSkillsUsed(s => ({ ...s, [current]: { ...s[current], swap:true } }));
                   setSkillMode(null);
                   setSelectedPiece(null); // 清除选中状态
-                  // 技能使用后切换回合
-                  setCurrent(other);
+                  toast.show('移形换影已完成，你可以再落子一次');
+                  // 移形换影技能：交换完成后不切换回合，当前玩家可以再落子一次
                 }
                 return;
               }
