@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.wuziqi.game" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>五子棋游戏</name>
+    <description>
+        技能五子棋 - 支持普通模式和技能模式的五子棋游戏
+    </description>
+    <author email="your-email@example.com" href="https://github.com/Atomyi1412/wuziqi">
+        五子棋开发团队
+    </author>
+    <content src="index.html" />
+    
+    <!-- 网络访问权限 -->
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    
+    <!-- Android特定配置 -->
+    <platform name="android">
+        <allow-intent href="market:*" />
+        
+        <!-- 应用权限将自动添加到AndroidManifest.xml -->
+        
+        <!-- 性能优化 -->
+        <preference name="android-minSdkVersion" value="21" />
+        <preference name="android-targetSdkVersion" value="35" />
+        <preference name="android-compileSdkVersion" value="35" />
+        <preference name="AndroidLaunchMode" value="singleTop" />
+        <preference name="AndroidInsecureFileModeEnabled" value="true" />
+    </platform>
+    
+    <!-- 全局首选项 -->
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="BackgroundColor" value="#ffffff" />
+    <preference name="HideKeyboardFormAccessoryBar" value="true" />
+    <preference name="Orientation" value="default" />
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="3000" />
+    <preference name="AutoHideSplashScreen" value="true" />
+    <preference name="SplashShowOnlyFirstTime" value="false" />
+    
+    <!-- 移动端优化 -->
+    <preference name="Fullscreen" value="false" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#000000" />
+    <preference name="StatusBarStyle" value="lightcontent" />
+</widget>

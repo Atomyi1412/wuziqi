@@ -2,7 +2,9 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
     <title>技能五 vs 子祺 - 五子棋对战</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -360,6 +362,26 @@
         }
       }
     </style>
+    
+    <!-- Cordova脚本 -->
+    <script type="text/javascript" src="cordova.js"></script>
+    
+    <!-- 设备就绪事件处理 -->
+    <script type="text/javascript">
+    document.addEventListener('deviceready', function() {
+        console.log('Cordova设备就绪');
+        
+        // 隐藏启动画面
+        if (navigator.splashscreen) {
+            navigator.splashscreen.hide();
+        }
+        
+        // 状态栏配置
+        if (window.StatusBar) {
+            StatusBar.styleDefault();
+        }
+    }, false);
+    </script>
   </head>
   <body>
     <div id="root"></div>
@@ -430,7 +452,7 @@
         return null;
       }
 
-      // 全盘扫描的胜负判定后备：当最后一步判赢未命中时，确保仍能识别连五
+      // 全盘扫描判赢的后备逻辑，确保AI连五后也能判赢
       function calcWinAny(board) {
         const dirs = [[1,0],[0,1],[1,1],[1,-1]];
         const inBounds = (r,c)=> r>=0 && r<SIZE && c>=0 && c<SIZE;
@@ -807,7 +829,6 @@
         };
 
         React.useEffect(()=>{
-          // 优先使用“最近一步”判赢；若未命中，再进行全盘扫描作为后备
           if (lastMove) {
             const w = calcWin(board, lastMove.row, lastMove.col);
             if (w != null) { setWinner(w); return; }

@@ -1,0 +1,9 @@
+/* 额外细节样式与动画 */
+.stone.black:hover, .stone.white:hover { transform: scale(1.06); }
+.btn { will-change: transform, box-shadow; }
+.skill-card { transition: transform .12s ease, background .2s ease; }
+.skill-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.06); }
+.header .title { background: linear-gradient(90deg, #93c5fd, #c4b5fd, #38bdf8); -webkit-background-clip: text; background-clip: text; color: transparent; }
+@media (max-width: 980px) {
+  .board { max-width: 92vw; }
+}

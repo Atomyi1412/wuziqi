@@ -1,0 +1,39 @@
+{
+  "name": "wuziqi-mobile",
+  "displayName": "五子棋游戏",
+  "version": "1.0.0",
+  "description": "技能五子棋移动应用",
+  "main": "index.js",
+  "scripts": {
+    "build": "cordova build android",
+    "build-release": "cordova build android --release",
+    "run": "cordova run android",
+    "prepare": "cordova prepare android"
+  },
+  "keywords": [
+    "五子棋",
+    "游戏",
+    "cordova",
+    "android"
+  ],
+  "author": "五子棋开发团队",
+  "license": "MIT",
+  "devDependencies": {
+    "cordova-android": "^14.0.1",
+    "cordova-browser": "^7.0.0",
+    "cordova-plugin-device": "^3.0.0",
+    "cordova-plugin-splashscreen": "^6.0.1",
+    "cordova-plugin-statusbar": "^4.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "browser",
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-device": {}
+    }
+  }
+}
