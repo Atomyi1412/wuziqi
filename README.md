@@ -59,6 +59,8 @@ wuziqi/
 2. 在 Netlify 中连接你的 Git 仓库
 3. Netlify 会自动读取 `netlify.toml` 配置并部署
 
+> 完整的 Git 自动部署流程、分支策略与故障排查，请参见 `DEPLOY.md`。
+
 ### 部署配置说明
 
 项目包含以下部署配置：

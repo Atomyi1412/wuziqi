@@ -392,7 +392,10 @@
         const defaultColors = ['#111827','#f3f4f6','#e11d48','#2563eb','#10b981','#f59e0b','#8b5cf6','#0ea5e9'];
         const [normalConfig, setNormalConfig] = React.useState({
           count: 2,
-          players: [ { name:'玩家1', color:'#111827' }, { name:'玩家2', color:'#f3f4f6' } ]
+          players: [
+            { name:'玩家1', color:'#111827', type:'human', difficulty:'easy' },
+            { name:'玩家2', color:'#f3f4f6', type:'human', difficulty:'easy' }
+          ]
         });
         const [showNormalConfig, setShowNormalConfig] = React.useState(false);
         const ensureConfigCount = React.useCallback((n)=>{
@@ -400,7 +403,7 @@
             let arr = prev.players.slice(0, n);
             while(arr.length < n){
               const i = arr.length;
-              arr.push({ name:`玩家${i+1}`, color: defaultColors[i % defaultColors.length] });
+              arr.push({ name:`玩家${i+1}`, color: defaultColors[i % defaultColors.length], type:'human', difficulty:'easy' });
             }
             return { ...prev, count:n, players: arr };
           });
@@ -428,6 +431,7 @@
         });
         const [winner, setWinner] = React.useState(null);
         const [lastMove, setLastMove] = React.useState(null);
+        const [aiThinking, setAiThinking] = React.useState(false);
         const [skillMode, setSkillMode] = React.useState(null); // { type: 'remove'|'add'|'swap', step?:1|2, first?:{r,c} }
         const [selectedPiece, setSelectedPiece] = React.useState(null); // 移形换影技能选中的棋子位置 {r, c}
         const [showRules, setShowRules] = React.useState(false);
@@ -451,6 +455,111 @@
           setLastMove({ row, col });
         };
 
+        // ===== 普通模式 AI 逻辑与辅助函数 =====
+        const inBoundsN = (r,c)=> r>=0 && r<SIZE && c>=0 && c<SIZE;
+        function wouldWinAtN(board, r, c, pid){
+          if (board[r][c] != null) return false;
+          const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+          for (const [dr,dc] of dirs){
+            let count = 1;
+            let rr=r+dr, cc=c+dc;
+            while(inBoundsN(rr,cc) && board[rr][cc]===pid){ count++; rr+=dr; cc+=dc; }
+            rr=r-dr; cc=c-dc;
+            while(inBoundsN(rr,cc) && board[rr][cc]===pid){ count++; rr-=dr; cc-=dc; }
+            if (count>=5) return true;
+          }
+          return false;
+        }
+
+        function listEmptyN(board){
+          const cells=[];
+          for(let r=0;r<SIZE;r++){
+            for(let c=0;c<SIZE;c++){
+              if(board[r][c]==null) cells.push([r,c]);
+            }
+          }
+          return cells;
+        }
+
+        function hasNeighbourN(board, r, c){
+          for(let dr=-1;dr<=1;dr++){
+            for(let dc=-1;dc<=1;dc++){
+              if(dr===0 && dc===0) continue;
+              const rr=r+dr, cc=c+dc;
+              if(inBoundsN(rr,cc) && board[rr][cc]!=null) return true;
+            }
+          }
+          return false;
+        }
+
+        function scoreCellN(board, r, c, pid){
+          const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+          const opponents = players.map(p=>p.id).filter(id=>id!==pid);
+          let selfBest=0, oppBest=0;
+          for(const [dr,dc] of dirs){
+            let self=1, rr=r+dr, cc=c+dc;
+            while(inBoundsN(rr,cc) && board[rr][cc]===pid){ self++; rr+=dr; cc+=dc; }
+            rr=r-dr; cc=c-dc;
+            while(inBoundsN(rr,cc) && board[rr][cc]===pid){ self++; rr-=dr; cc-=dc; }
+            selfBest=Math.max(selfBest,self);
+            let oppDirBest=0;
+            for(const oid of opponents){
+              let opp=1; rr=r+dr; cc=c+dc;
+              while(inBoundsN(rr,cc) && board[rr][cc]===oid){ opp++; rr+=dr; cc+=dc; }
+              rr=r-dr; cc=c-dc;
+              while(inBoundsN(rr,cc) && board[rr][cc]===oid){ opp++; rr-=dr; cc-=dc; }
+              oppDirBest=Math.max(oppDirBest, opp);
+            }
+            oppBest=Math.max(oppBest, oppDirBest);
+          }
+          const centerBias = (Math.abs(r-(SIZE/2)) + Math.abs(c-(SIZE/2)));
+          const centerScore = 8 - Math.min(8, centerBias);
+          return (selfBest*selfBest*2) + (oppBest*oppBest) + centerScore + (hasNeighbourN(board,r,c)?5:0);
+        }
+
+        function chooseAIMove(board, pid, difficulty){
+          const empties=listEmptyN(board);
+          if(empties.length===0) return null;
+          for(const [r,c] of empties){ if(wouldWinAtN(board,r,c,pid)) return {r,c}; }
+          const opponents = players.map(p=>p.id).filter(id=>id!==pid);
+          for(const [r,c] of empties){
+            for(const oid of opponents){ if(wouldWinAtN(board,r,c,oid)) return {r,c}; }
+          }
+          if(difficulty==='easy'){
+            const near=empties.filter(([r,c])=>hasNeighbourN(board,r,c));
+            const pool = near.length>0?near:empties;
+            const [r,c]=pool[Math.floor(Math.random()*pool.length)];
+            return {r,c};
+          }
+          if(difficulty==='medium'){
+            let best=null, bestScore=-Infinity;
+            for(const [r,c] of empties){
+              const s=scoreCellN(board,r,c,pid);
+              if(s>bestScore){ bestScore=s; best={r,c}; }
+            }
+            return best;
+          }
+          let bests=[]; let bestScore=-Infinity;
+          for(const [r,c] of empties){
+            const s=scoreCellN(board,r,c,pid);
+            if(s>bestScore){ bestScore=s; bests=[{r,c}]; }
+            else if(s===bestScore){ bests.push({r,c}); }
+          }
+          if(bests.length===1) return bests[0];
+          const near=bests.filter(m=>hasNeighbourN(board,m.r,m.c));
+          return (near[0]||bests[0]);
+        }
+
+        function placeNormalAt(r,c,pid){
+          setBoard(prev=>{
+            const next=prev.map(row=>row.slice());
+            next[r][c]=pid;
+            return next;
+          });
+          setLastMove({ r, c });
+          setCurrentIndex(i => (i + 1) % players.length);
+        }
+
         const handleBoardClick = (e) => {
           if (winner != null) return;
           
@@ -468,6 +577,7 @@
 
           // 普通模式：仅落子与轮换，不含技能/冻结
           if (gameMode === 'normal') {
+            if (players[currentIndex]?.type === 'ai') return;
             if (board[row][col]) return;
             const pid = currentIndex; // 用玩家索引标记棋盘
             setBoard(prev=>{
@@ -597,6 +707,25 @@
           }
         }, [board, lastMove]);
 
+        // 普通模式：AI 自动回合
+        React.useEffect(()=>{
+          if (gameMode !== 'normal' || winner != null) return;
+          const cur = players[currentIndex];
+          if (!cur || cur.type !== 'ai') return;
+          if (aiThinking) return;
+          setAiThinking(true);
+          setTimeout(()=>{
+            const move = chooseAIMove(board, cur.id, cur.difficulty || 'easy');
+            if (move) {
+              const {r,c}=move;
+              if(!board[r][c]){
+                placeNormalAt(r,c,cur.id);
+              }
+            }
+            setAiThinking(false);
+          }, 350);
+        }, [gameMode, currentIndex, board, players, winner, aiThinking]);
+
         React.useEffect(()=>{
           if (winner != null) {
             const name = gameMode === 'skill'
@@ -618,6 +747,7 @@
             setSkillMode(null);
           } else if (gameMode === 'normal') {
             setCurrentIndex(0);
+            setAiThinking(false);
           }
         };
 
@@ -636,6 +766,7 @@
           setLastMove(null);
           setCurrentIndex(0);
           setSkillMode(null);
+          setAiThinking(false);
         };
 
         // Skills
@@ -777,7 +908,7 @@
                       <span>普通模式</span>
                       {players.map((p)=> (
                         <span key={`h-${p.id}`} className="badge" style={{borderColor:'rgba(255,255,255,0.25)'}}>
-                          {p.name}
+                          {p.name}{p.type === 'ai' ? '（电脑）' : ''}
                           <span className="color-dot" style={{background:p.color}}></span>
                         </span>
                       ))}
@@ -806,7 +937,12 @@
                       <>轮到：{current === 'black' ? `${names.black}（黑棋）` : `${names.white}（白棋）`}
                         {frozen[current] && <span className="frozen-notice">（本回合冻结，自动跳过）</span>}</>
                     ) : (
-                      <>轮到：{players[currentIndex]?.name || '-'}<span className="frozen-notice">（普通模式：无技能）</span></>
+                      <>轮到：{players[currentIndex]?.name || '-'}
+                        {players[currentIndex]?.type === 'ai' && (
+                          <span>（电脑：{players[currentIndex]?.difficulty === 'hard' ? '困难' : (players[currentIndex]?.difficulty === 'medium' ? '中等' : '简单')}{aiThinking ? '，思考中…' : ''}）</span>
+                        )}
+                        <span className="frozen-notice">（普通模式：无技能）</span>
+                      </>
                     )}
                   </div>
                 )}
@@ -893,6 +1029,23 @@
                             const v = e.target.value;
                             setNormalConfig(prev=>{ const arr = prev.players.slice(); arr[i] = { ...arr[i], color: v }; return { ...prev, players: arr }; });
                           }} />
+                          <select value={p.type || 'human'} onChange={(e)=>{
+                            const v = e.target.value;
+                            setNormalConfig(prev=>{ const arr = prev.players.slice(); arr[i] = { ...arr[i], type: v }; return { ...prev, players: arr }; });
+                          }}>
+                            <option value="human">人类</option>
+                            <option value="ai">电脑</option>
+                          </select>
+                          {p.type === 'ai' && (
+                            <select value={p.difficulty || 'easy'} onChange={(e)=>{
+                              const v = e.target.value;
+                              setNormalConfig(prev=>{ const arr = prev.players.slice(); arr[i] = { ...arr[i], difficulty: v }; return { ...prev, players: arr }; });
+                            }}>
+                              <option value="easy">简单</option>
+                              <option value="medium">中等</option>
+                              <option value="hard">困难</option>
+                            </select>
+                          )}
                         </div>
                       ))}
                     </div>
