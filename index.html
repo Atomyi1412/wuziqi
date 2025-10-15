@@ -498,7 +498,8 @@
 
         const placePiece = (row,col,color) => {
           setBoard(prev => {
-            if (prev[row][col]) return prev;
+            // 显式空值判断，避免数值0被视为“未占用”
+            if (prev[row][col] != null) return prev;
             const next = prev.map(r=>r.slice());
             next[row][col] = color;
             return next;
@@ -659,7 +660,8 @@
           // 普通模式：仅落子与轮换，不含技能/冻结
           if (gameMode === 'normal') {
             if (players[currentIndex]?.type === 'ai') return;
-            if (board[row][col]) return;
+            // 使用显式空值判断，修复0值（黑棋）被视为未占用的问题
+            if (board[row][col] != null) return;
             const pid = currentIndex; // 用玩家索引标记棋盘
             setBoard(prev=>{
               const next = prev.map(r=>r.slice());
@@ -689,7 +691,8 @@
               return;
             }
             if (skillMode.type === 'add') {
-              if (!board[row][col]) {
+              // 显式空值判断，避免误判
+              if (board[row][col] == null) {
                 placePiece(row, col, current);
                 setSkillsUsed(s => ({ ...s, [current]: { ...s[current], add:true } }));
                 setSkillMode(null);
@@ -760,8 +763,9 @@
             return;
           }
 
-          // Normal placement
-          if (board[row][col] || winner) return; // 如果位置已占用或游戏结束，直接返回
+          // Normal placement（技能模式下的常规落子）
+          // 使用显式空值判断，避免数值0被误当成空位
+          if (board[row][col] != null || winner) return; // 如果位置已占用或游戏结束，直接返回
           
           if (gameMode === 'skill') {
             setBoard(prev => {
@@ -799,7 +803,8 @@
             const move = chooseAIMove(board, cur.id, cur.difficulty || 'easy');
             if (move) {
               const {r,c}=move;
-              if(!board[r][c]){
+              // 显式空值判断，避免覆盖已有的黑棋(0)
+              if(board[r][c] == null){
                 placeNormalAt(r,c,cur.id);
               }
             }
