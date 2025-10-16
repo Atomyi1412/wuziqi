@@ -1048,14 +1048,13 @@
                 ) : (
                   <div className="player-turn">
                     {gameMode === 'skill' ? (
-                      <>轮到：{current === 'black' ? `${names.black}（黑棋）` : `${names.white}（白棋）`}
+                      <>轮到：{current === 'black' ? names.black : names.white}
                         {frozen[current] && <span className="frozen-notice">（本回合冻结，自动跳过）</span>}</>
                     ) : (
                       <>轮到：{players[currentIndex]?.name || '-'}
                         {players[currentIndex]?.type === 'ai' && (
                           <span>（电脑：{players[currentIndex]?.difficulty === 'hard' ? '困难' : (players[currentIndex]?.difficulty === 'medium' ? '中等' : '简单')}{aiThinking ? '，思考中…' : ''}）</span>
                         )}
-                        <span className="frozen-notice">（普通模式：无技能）</span>
                       </>
                     )}
                   </div>
