@@ -2,7 +2,9 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
     <title>技能五 vs 子祺 - 五子棋对战</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,31 +27,75 @@
         --white: #e5e7eb;
         --shadow: 0 12px 30px rgba(0,0,0,0.12);
       }
-      html, body { height: 100%; }
+      html { height: 100%; }
+      /* body高度在下方单独设置，考虑导航栏高度 */
       body {
-        margin: 0;
-        font-family: Inter, -apple-system, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-        color: var(--text);
-        background: var(--bg-gradient);
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        overflow-x: hidden;
-        /* 全局移动端触摸优化 */
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-        touch-action: manipulation;
-      }
+         margin: 0;
+         font-family: Inter, -apple-system, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+         color: var(--text);
+         background: var(--bg-gradient);
+         /* 设置body高度为视口高度减去导航栏高度，确保滚动边界正确 */
+         min-height: calc(100dvh - 120px);
+         height: calc(100dvh - 120px);
+         max-height: calc(100dvh - 120px);
+         /* 修改为flex布局，避免内容超出视口 */
+         display: flex;
+         flex-direction: column;
+         justify-content: center;
+         align-items: center;
+         overflow-x: hidden;
+         overflow-y: auto;
+         /* 顶部/底部安全区：避免标题贴近状态栏或刘海 */
+         padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+         padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+         /* 侧边保持原有间距 */
+         padding-left: 5px;
+         padding-right: 5px;
+         box-sizing: border-box;
+         /* 全局移动端触摸优化 */
+         -webkit-tap-highlight-color: transparent;
+         -webkit-touch-callout: none;
+         touch-action: manipulation;
+       }
       .container {
         width: min(1200px, 95vw);
         display: grid;
         grid-template-columns: 1fr 360px;
         gap: 20px;
+        /* 桌面端：使用动态视口高度，预留导航栏空间 */
+        max-height: calc(100dvh - 120px);
+        height: fit-content;
+        overflow-y: auto;
       }
       .container.start { grid-template-columns: 1fr; width: min(980px, 95vw); }
       .container.normal { grid-template-columns: 1fr; }
       @media (max-width: 980px) {
-        .container { grid-template-columns: 1fr; }
+        body {
+          min-height: calc(100dvh - 110px);
+          height: calc(100dvh - 110px);
+          max-height: calc(100dvh - 110px);
+        }
+        .container { 
+          grid-template-columns: 1fr; 
+          /* 移动端：计算可用高度时减去导航栏高度 */
+          max-height: calc(100dvh - 110px);
+          width: 99vw;
+          gap: clamp(4px, 2vw, 8px);
+        }
+      }
+      @media (max-width: 768px) {
+        body {
+          min-height: calc(100dvh - env(safe-area-inset-bottom, 0px) - 100px);
+          height: calc(100dvh - env(safe-area-inset-bottom, 0px) - 100px);
+          max-height: calc(100dvh - env(safe-area-inset-bottom, 0px) - 100px);
+        }
+        .container {
+          width: 100vw;
+          gap: clamp(2px, 1.5vw, 6px);
+          /* 小屏设备：减去导航栏高度和安全区域 */
+          max-height: calc(100dvh - env(safe-area-inset-bottom, 0px) - 100px);
+          padding: 0 2px;
+        }
       }
       .card {
         background: var(--card-bg);
@@ -61,27 +107,112 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px 20px;
+        padding: clamp(8px, 2.5vw, 18px) clamp(10px, 4vw, 20px);
+        /* 顶部内边距固定为 32px，并叠加安全区 */
+        padding-top: calc(env(safe-area-inset-top, 0px) + 32px);
         border-bottom: 1px solid var(--card-border);
+        overflow: visible;
+        min-height: clamp(50px, 12vw, 70px);
+        position: relative;
       }
-      .header .left { display: flex; align-items: center; gap: 12px; }
-      .icon-btn { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:999px; border:1px solid var(--card-border); background: #ffffff; color: var(--text); cursor:pointer; transition: background .2s ease, border-color .2s ease, transform .1s ease, color .2s ease; }
-      .icon-btn svg { width:20px; height:20px; }
+      
+      .header .left { 
+        display: flex; 
+        align-items: center; 
+        gap: clamp(6px, 2vw, 12px); 
+        flex: 1; 
+        min-width: 0;
+        overflow: hidden;
+      }
+      
+      .icon-btn { 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        width: clamp(28px, 7vw, 36px); 
+        height: clamp(28px, 7vw, 36px); 
+        border-radius: 999px; 
+        border: 1px solid var(--card-border); 
+        background: #ffffff; 
+        color: var(--text); 
+        cursor: pointer; 
+        transition: background .2s ease, border-color .2s ease, transform .1s ease, color .2s ease;
+        /* 下移按钮，避免贴近顶部（进一步增加间距） */
+        margin-top: clamp(6px, 2vw, 16px);
+        flex-shrink: 0;
+      }
+      
+      .icon-btn svg { 
+        width: clamp(14px, 4vw, 20px); 
+        height: clamp(14px, 4vw, 20px); 
+      }
+      
       .icon-btn:hover { background: rgba(15,23,42,0.06); color: var(--text); border-color: var(--card-border); }
       .icon-btn:active { transform: translateY(1px); }
       .icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(15,23,42,0.18); }
+      
       .title {
         font-weight: 700;
-        letter-spacing: 0.5px;
-        display: flex; gap: 10px; align-items: center;
+        letter-spacing: 0.1px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: clamp(4px, 1.5vw, 8px);
+        flex: 1;
+        min-width: 0;
         color: var(--text);
         background: none;
         -webkit-text-fill-color: var(--text);
+        line-height: 1.3;
+        overflow: visible;
       }
-      .badge { padding: 6px 10px; border-radius: 999px; font-size: 12px; color: var(--text); background: #f8fafc; border: 1px solid var(--card-border); }
+      
+      .title-main { 
+        display: block; 
+        line-height: 1.3; 
+        /* 标题与按钮对齐，下移更多以提升观感 */
+        margin-top: clamp(6px, 2vw, 16px);
+        font-size: clamp(16px, 5vw, 22px);
+        flex: 1 0 auto;
+        min-width: 0;
+      }
+      
+      .title .badge { 
+        margin: 0;
+        flex-shrink: 0;
+      }
+      
+      .badge { 
+        padding: clamp(4px, 1.5vw, 8px) clamp(8px, 3vw, 12px); 
+        border-radius: 999px; 
+        font-size: clamp(12px, 3vw, 16px); 
+        color: var(--text); 
+        background: #f8fafc; 
+        border: 1px solid var(--card-border);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
       .badge.black { background: #f8fafc; }
       .badge.white { background: #f8fafc; }
-      .board-wrap { padding: 20px; }
+      .board-wrap { 
+        padding: clamp(2px, 2vw, 12px); 
+        /* 移动端优化：减少padding以节省空间 */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+      }
+      @media (max-width: 768px) {
+        .board-wrap { 
+          padding: 4px; 
+        }
+      }
+      @media (max-width: 480px) {
+        .board-wrap { 
+          padding: 2px; 
+        }
+      }
       .board {
         aspect-ratio: 1 / 1;
         max-width: 740px;
@@ -100,11 +231,24 @@
         -ms-user-select: none;
         user-select: none;
         touch-action: manipulation;
+        /* 确保棋盘不会超出容器 */
+        flex-shrink: 1;
+        min-width: 0;
+        min-height: 0;
       }
       @media (max-width: 768px) {
         .board {
-          max-width: 90vw;
+          /* 移动端优化：使用更合理的尺寸计算 */
+          max-width: min(95vw, calc(100dvh - 120px));
+          max-height: min(95vw, calc(100dvh - 120px));
           border-radius: 8px;
+        }
+      }
+      @media (max-width: 480px) {
+        .board {
+          max-width: min(98vw, calc(100dvh - 100px));
+          max-height: min(98vw, calc(100dvh - 100px));
+          border-radius: 6px;
         }
       }
       .grid { 
@@ -134,7 +278,7 @@
       .btn:active { transform: translateY(0); }
       /* 统一变体按钮为中性浅色，避免多彩分散 */
       .btn.accent, .btn.success, .btn.danger { background: #ffffff; color: var(--text); border-color: var(--card-border); }
-      /* 统一技能说明按钮颜色（柔和中性） */
+      /* 统一技能说明按钮颜色（柔中和性） */
       .btn.skill { background: #f8fafc; color: var(--text); border-color: #e2e8f0; }
       .btn.skill:hover { filter: brightness(1.05); }
       
@@ -155,6 +299,57 @@
         }
         .btn:active, .icon-btn:active {
           transform: none !important;
+        }
+      }
+      
+      /* 移动端专用布局优化 */
+      @media (max-width: 768px) and (orientation: portrait) {
+        .container {
+          /* 竖屏模式下优化布局 */
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          height: calc(100dvh - 10px);
+        }
+        .card {
+          width: 100%;
+          max-width: none;
+          flex-shrink: 0;
+        }
+        .board-wrap {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 0;
+        }
+        .controls {
+          flex-shrink: 0;
+          max-height: 200px;
+          overflow-y: auto;
+        }
+      }
+      
+      /* 横屏模式优化 */
+      @media (max-width: 768px) and (orientation: landscape) {
+        .container {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 8px;
+          height: calc(100dvh - 10px);
+        }
+        .board-wrap {
+          padding: 4px;
+        }
+        .board {
+          max-width: min(calc(100dvh - 20px), 95vw);
+          max-height: min(calc(100dvh - 20px), 95vw);
+        }
+        .controls {
+          width: 200px;
+          max-height: calc(100dvh - 20px);
+          overflow-y: auto;
         }
       }
       
@@ -237,8 +432,30 @@
           width: 6px; height: 6px;
         }
       }
-      .controls { padding: 16px; display: grid; gap: 12px; }
-      .row { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+      .controls { 
+        padding: 16px; 
+        display: grid; 
+        gap: 12px; 
+      }
+      @media (max-width: 768px) {
+        .controls {
+          padding: 12px;
+          gap: 16px;
+        }
+      }
+      .row { 
+        display: flex; 
+        gap: 10px; 
+        align-items: center; 
+        justify-content: space-between; 
+        flex-wrap: wrap;
+      }
+      @media (max-width: 768px) {
+        .row {
+          gap: 12px;
+          justify-content: center;
+        }
+      }
       .btn {
         padding: 10px 14px;
         border-radius: 12px;
@@ -249,16 +466,80 @@
         transition: transform .18s ease, filter .18s ease;
         font-weight: 600;
         letter-spacing: .2px;
+        /* 移动端优化：增加触摸目标大小 */
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+      @media (max-width: 768px) {
+        .btn {
+          padding: 12px 16px;
+          min-height: 48px;
+          font-size: 16px;
+          border-radius: 8px;
+        }
       }
       .btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
       .btn:disabled { opacity: .45; cursor: not-allowed; }
       .btn.accent, .btn.danger, .btn.success { background: #ffffff; color: var(--text); border-color: var(--card-border); }
       .panel { padding: 16px; }
       .status { font-family: JetBrains Mono, monospace; color: var(--muted); font-size: 13px; }
-      .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .skill-card { padding: 12px; border-radius: 12px; border: 1px solid var(--card-border); background: #ffffff; }
-      .skill-card h4 { margin: 6px 0; font-size: 14px; }
-      .count { font-size: 12px; color: var(--muted); }
+      .skill-grid { 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 10px; 
+      }
+      @media (max-width: 768px) {
+        .skill-grid {
+          gap: 12px;
+        }
+      }
+      @media (max-width: 480px) {
+        .skill-grid {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+      }
+      .skill-card { 
+        padding: 12px; 
+        border-radius: 12px; 
+        border: 1px solid var(--card-border); 
+        background: #ffffff; 
+        min-height: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      @media (max-width: 768px) {
+        .skill-card {
+          padding: 16px;
+          min-height: 70px;
+          border-radius: 8px;
+        }
+      }
+      .skill-card h4 { 
+        margin: 6px 0; 
+        font-size: 14px; 
+        line-height: 1.4;
+      }
+      @media (max-width: 768px) {
+        .skill-card h4 {
+          font-size: 16px;
+          margin: 4px 0;
+        }
+      }
+      .count { 
+        font-size: 12px; 
+        color: var(--muted); 
+        line-height: 1.3;
+      }
+      @media (max-width: 768px) {
+        .count {
+          font-size: 14px;
+        }
+      }
       .footer { padding: 10px 16px; border-top: 1px solid var(--card-border); display: flex; justify-content: space-between; align-items: center; }
       .link { color: #0ea5e9; text-decoration: none; }
       .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,1); display: grid; place-items: center; z-index: 9998; }
@@ -286,30 +567,35 @@
       /* 当前玩家横幅（柔和苹果风） */
       .current-player-banner {
         text-align: center;
-        margin: 20px 0;
-        padding: 16px 24px;
+        margin: clamp(8px, 3vw, 16px) 0;
+        padding: clamp(12px, 4vw, 20px) clamp(16px, 5vw, 28px);
         background: #ffffff;
         border: 1px solid var(--card-border);
         border-radius: 16px;
         box-shadow: var(--shadow);
       }
       .player-turn {
-        font-size: 22px;
+        font-size: clamp(18px, 5vw, 26px);
         font-weight: 700;
         color: var(--text);
         letter-spacing: .5px;
       }
       .winner-banner {
-        font-size: 24px;
+        font-size: clamp(20px, 6vw, 28px);
         font-weight: 800;
         color: var(--accent);
         letter-spacing: 1px;
       }
+      /* 技能面板底部留白，避免固定导航遮挡 */
+      .skill-bottom-spacer {
+        height: calc(env(safe-area-inset-bottom, 0px) + clamp(120px, 14vw, 160px));
+        width: 100%;
+      }
       .frozen-notice {
         display: block;
-        font-size: 14px;
+        font-size: clamp(12px, 3vw, 16px);
         color: var(--muted);
-        margin-top: 6px;
+        margin-top: clamp(4px, 1.5vw, 8px);
         font-weight: 500;
       }
       
@@ -341,25 +627,84 @@
           padding: 12px 16px;
         }
         
-        .player-turn { font-size: 20px; }
-        .winner-banner { font-size: 22px; }
-        .frozen-notice { font-size: 13px; }
+        /* 平板设备优化 - 基础样式已使用clamp()自适应 */
       }
       
       @media (max-width: 480px) {
-        .player-turn {
-          font-size: 18px;
+        /* 手机设备优化 - 基础样式已使用clamp()自适应 */
+      }
+      
+      /* 移动设备优化 - 基础样式已使用clamp()自适应，无需额外断点 */
+      
+      /* 超小屏幕优化（320px以下） */
+      @media (max-width: 320px) {
+        .header {
+          padding: clamp(6px, 2vw, 8px) clamp(8px, 3vw, 10px);
+          min-height: clamp(45px, 10vw, 55px);
         }
         
-        .winner-banner {
-          font-size: 20px;
+        .title-main {
+          font-size: clamp(11px, 2.8vw, 13px);
+          margin: 0 0 2px;
         }
         
-        .frozen-notice {
-          font-size: 12px;
+        .badge {
+          font-size: clamp(8px, 1.5vw, 9px);
         }
       }
+      
+      /* 底部导航栏样式（苹果简约风） */
+      .bottom-nav {
+        position: fixed;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(980px, 96vw);
+        background: #ffffff;
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        padding: 8px 10px;
+        /* 允许在导航区域内进行纵向滚动手势，以便上拉内容 */
+        touch-action: pan-y;
+      }
+      .nav-row { display:flex; gap:8px; justify-content:center; flex-wrap: wrap; }
+      .nav-row .btn { flex: 1; min-width: 0; }
+      .bottom-nav .btn { padding:8px 12px; border-radius:12px; }
+      
+      /* 移动端优化 */
+      @media (max-width: 768px) {
+        .bottom-nav { width: 98vw; padding:6px 8px; }
+        .nav-row { gap:6px; }
+        .bottom-nav .btn { padding:7px 10px; border-radius:10px; }
+      }
+      @media (max-width: 480px) {
+        .bottom-nav { width: 98vw; padding:6px 6px; }
+        .nav-row { gap:6px; }
+        .bottom-nav .btn { padding:6px 9px; border-radius:10px; font-size: 13px; }
+      }
     </style>
+    
+    <!-- Cordova脚本 -->
+    <script type="text/javascript" src="cordova.js"></script>
+    
+    <!-- 设备就绪事件处理 -->
+    <script type="text/javascript">
+    document.addEventListener('deviceready', function() {
+        console.log('Cordova设备就绪');
+        
+        // 隐藏启动画面
+        if (navigator.splashscreen) {
+            navigator.splashscreen.hide();
+        }
+        
+        // 状态栏配置
+        if (window.StatusBar) {
+            StatusBar.styleDefault();
+        }
+    }, false);
+    </script>
   </head>
   <body>
     <div id="root"></div>
@@ -430,7 +775,7 @@
         return null;
       }
 
-      // 全盘扫描的胜负判定后备：当最后一步判赢未命中时，确保仍能识别连五
+      // 全盘扫描判赢的后备逻辑，确保AI连五后也能判赢
       function calcWinAny(board) {
         const dirs = [[1,0],[0,1],[1,1],[1,-1]];
         const inBounds = (r,c)=> r>=0 && r<SIZE && c>=0 && c<SIZE;
@@ -458,6 +803,7 @@
         const defaultColors = ['#111827','#f3f4f6','#e11d48','#2563eb','#10b981','#f59e0b','#8b5cf6','#0ea5e9'];
         const [normalConfig, setNormalConfig] = React.useState({
           count: 2,
+          allowUndo: false,
           players: [
             { name:'玩家1', color:'#111827', type:'human', difficulty:'easy' },
             { name:'玩家2', color:'#f3f4f6', type:'human', difficulty:'easy' }
@@ -491,6 +837,12 @@
         const [current, setCurrent] = React.useState('black');
         const [names] = React.useState({ black: '技能五', white: '子祺' });
         const [frozen, setFrozen] = React.useState({ black:false, white:false });
+        // 首回合限制：记录双方已落子次数（技能模式）
+        const [moveCount, setMoveCount] = React.useState({ black:0, white:0 });
+        // 普通模式悔棋：记录历史 {row,col,pid}
+        const [normalHistory, setNormalHistory] = React.useState([]);
+        // 悔棋二次确认弹窗
+        const [showUndoConfirm, setShowUndoConfirm] = React.useState(false);
         const [skillsUsed, setSkillsUsed] = React.useState({
           black: { remove:false, freeze:false, instant:false, swap:false, add:false },
           white: { remove:false, freeze:false, instant:false, swap:false, add:false },
@@ -501,6 +853,7 @@
         const [skillMode, setSkillMode] = React.useState(null); // { type: 'remove'|'add'|'swap', step?:1|2, first?:{r,c} }
         const [selectedPiece, setSelectedPiece] = React.useState(null); // 移形换影技能选中的棋子位置 {r, c}
         const [showRules, setShowRules] = React.useState(false);
+        const [editOpen, setEditOpen] = React.useState(false);
         // 拖动与缩放状态
         const [panMode, setPanMode] = React.useState(false);
         const [dragging, setDragging] = React.useState(false);
@@ -526,6 +879,10 @@
             return next;
           });
           setLastMove({ row, col });
+          // 技能模式下：统计落子次数用于首回合禁用逻辑
+          if (gameMode === 'skill') {
+            setMoveCount(m => ({ ...m, [color]: m[color] + 1 }));
+          }
         };
 
         // ===== 普通模式 AI 逻辑与辅助函数 =====
@@ -629,9 +986,30 @@
             next[r][c]=pid;
             return next;
           });
-          setLastMove({ r, c });
+          setLastMove({ row: r, col: c });
+          setNormalHistory(h => h.concat({ row: r, col: c, pid }));
           setCurrentIndex(i => (i + 1) % players.length);
         }
+
+        // 撤回普通模式的最后一步落子
+        const undoLastMove = () => {
+          if (gameMode !== 'normal') return;
+          setNormalHistory(prev => {
+            if (!prev.length) { toast.show('没有可撤回的落子'); return prev; }
+            const arr = prev.slice();
+            const last = arr.pop();
+            setBoard(b => {
+              const next = b.map(row => row.slice());
+              if (last) { next[last.row][last.col] = null; }
+              return next;
+            });
+            setCurrentIndex(last ? last.pid : 0);
+            setLastMove(arr.length ? arr[arr.length - 1] : null);
+            setWinner(null);
+            setAiThinking(false);
+            return arr;
+          });
+        };
 
         // 棋盘拖动事件处理（启用拖动模式时生效）
         const onGridPointerDown = (e) => {
@@ -690,6 +1068,7 @@
               return next;
             });
             setLastMove({ row, col });
+            setNormalHistory(h => h.concat({ row, col, pid }));
             setCurrentIndex(i => (i + 1) % players.length);
             return;
           }
@@ -795,6 +1174,8 @@
               return next;
             });
             setLastMove({ row, col });
+            // 常规落子也计入首回合统计
+            setMoveCount(m => ({ ...m, [current]: m[current] + 1 }));
             const nextTurn = current === 'black' ? 'white' : 'black';
             if (frozen[nextTurn]) {
               // auto-skip opponent: clear freeze and keep current turn
@@ -807,7 +1188,6 @@
         };
 
         React.useEffect(()=>{
-          // 优先使用“最近一步”判赢；若未命中，再进行全盘扫描作为后备
           if (lastMove) {
             const w = calcWin(board, lastMove.row, lastMove.col);
             if (w != null) { setWinner(w); return; }
@@ -850,6 +1230,8 @@
           setWinner(null);
           setLastMove(null);
           setSelectedPiece(null);
+          // 重置技能模式的落子计数
+          setMoveCount({ black:0, white:0 });
           if (gameMode === 'skill') {
             setCurrent('black');
             setFrozen({ black:false, white:false });
@@ -858,7 +1240,9 @@
           } else if (gameMode === 'normal') {
             setCurrentIndex(0);
             setAiThinking(false);
+            setNormalHistory([]);
           }
+          setShowUndoConfirm(false);
         };
 
         const startSkillGame = () => {
@@ -877,12 +1261,16 @@
           setCurrentIndex(0);
           setSkillMode(null);
           setAiThinking(false);
+          setNormalHistory([]);
+          setShowUndoConfirm(false);
         };
 
         // Skills
         const useRemove = () => {
           if (winner) return;
           if (skillsUsed[current].remove) return;
+          // 首回合禁止使用“飞沙走石”
+          if (moveCount[current] === 0) { toast.show('首回合不可使用“飞沙走石”'); return; }
           setSkillMode({ type:'remove' });
           setSelectedPiece(null); // 清除之前的选中状态
           toast.show('请选择要移除的对手棋子');
@@ -906,6 +1294,8 @@
         const useSwap = () => {
           if (winner) return;
           if (skillsUsed[current].swap) return;
+          // 首回合禁止使用“移形换影”
+          if (moveCount[current] === 0) { toast.show('首回合不可使用“移形换影”'); return; }
           setSkillMode({ type:'swap', step:1 });
           setSelectedPiece(null); // 清除之前的选中状态
           toast.show('请选择己方棋子（可重新选择或点击已选中棋子取消）');
@@ -945,7 +1335,7 @@
             <div className="skill-card">
               <h4>飞沙走石</h4>
               <p className="count">剩余：{skillsUsed[current].remove ? 0 : 1}</p>
-              <button className="btn skill" disabled={skillsUsed[current].remove || !!winner} onClick={useRemove}>移除对手任意一枚棋子</button>
+              <button className="btn skill" disabled={skillsUsed[current].remove || !!winner || moveCount[current] === 0} onClick={useRemove}>移除对手任意一枚棋子</button>
             </div>
             <div className="skill-card">
               <h4>静如止水</h4>
@@ -960,7 +1350,7 @@
             <div className="skill-card">
               <h4>移形换影</h4>
               <p className="count">剩余：{skillsUsed[current].swap ? 0 : 1}</p>
-              <button className="btn skill" disabled={skillsUsed[current].swap || !!winner} onClick={useSwap}>交换双方一枚棋子</button>
+              <button className="btn skill" disabled={skillsUsed[current].swap || !!winner || moveCount[current] === 0} onClick={useSwap}>交换双方一枚棋子</button>
             </div>
             <div className="skill-card">
               <h4>神来之笔</h4>
@@ -1009,31 +1399,16 @@
                   <div className="title">
                   {gameMode === 'skill' ? (
                     <>
-                      <span>技能五 vs 子祺</span>
-                      <span className="badge black">黑：技能五</span>
-                      <span className="badge white">白：子祺</span>
+                      <span className="title-main">技能模式（技能五VS子祺）</span>
                     </>
                   ) : (
                     <>
-                      <span>普通模式</span>
-                      {players.map((p)=> (
-                        <span key={`h-${p.id}`} className="badge" style={{borderColor:'rgba(255,255,255,0.25)'}}>
-                          {p.name}{p.type === 'ai' ? '（电脑）' : ''}
-                          <span className="color-dot" style={{background:p.color}}></span>
-                        </span>
-                      ))}
+                      <span className="title-main">普通模式</span>
                     </>
                   )}
                   </div>
                 </div>
-              <div className="row">
-                  <button className="btn" onClick={()=>setShowRules(true)}>规则说明</button>
-                  <button className="btn" onClick={reset}>重新开始</button>
-                  <button className="btn" onClick={()=>setPanMode(m=>!m)}>{panMode ? '拖动：开' : '拖动：关'}</button>
-                  <button className="btn" onClick={()=>setZoom(z=>Math.min(2.5, +(z+0.2).toFixed(2)))}>放大</button>
-                  <button className="btn" onClick={()=>setZoom(z=>Math.max(0.6, +(z-0.2).toFixed(2)))}>缩小</button>
-                  <button className="btn" onClick={()=>{ setZoom(1); setPan({x:0,y:0}); }}>复位</button>
-              </div>
+
               </div>
               {/* 大字报样式的当前玩家显示 */}
               <div className="current-player-banner">
@@ -1049,9 +1424,11 @@
                   <div className="player-turn">
                     {gameMode === 'skill' ? (
                       <>轮到：{current === 'black' ? names.black : names.white}
+                        <div className="color-dot" style={{ background: current === 'black' ? 'var(--black)' : 'var(--white)' }}></div>
                         {frozen[current] && <span className="frozen-notice">（本回合冻结，自动跳过）</span>}</>
                     ) : (
                       <>轮到：{players[currentIndex]?.name || '-'}
+                        <div className="color-dot" style={{ background: (players[currentIndex]?.color) || '#999' }}></div>
                         {players[currentIndex]?.type === 'ai' && (
                           <span>（电脑：{players[currentIndex]?.difficulty === 'hard' ? '困难' : (players[currentIndex]?.difficulty === 'medium' ? '中等' : '简单')}{aiThinking ? '，思考中…' : ''}）</span>
                         )}
@@ -1105,6 +1482,9 @@
                 </div>
               </div>
             )}
+            {gameMode === 'skill' && (
+              <div className="skill-bottom-spacer" aria-hidden="true"></div>
+            )}
 
             {showRules && (
               <div className="modal-backdrop" onClick={()=>setShowRules(false)}>
@@ -1146,6 +1526,12 @@
                         <label>玩家人数（≥2）：</label>
                         <input type="number" min={2} value={normalConfig.count} onChange={handleCountChange} onBlur={(e)=>ensureConfigCount(Math.max(2, Number(e.target.value)||2))} />
                       </div>
+                      <div className="form-row">
+                        <label style={{display:'flex', alignItems:'center', gap:'8px'}}>
+                          <input type="checkbox" checked={!!normalConfig.allowUndo} onChange={(e)=>setNormalConfig(prev=>({ ...prev, allowUndo: e.target.checked }))} />
+                          启用悔棋（默认关闭）
+                        </label>
+                      </div>
                       {normalConfig.players.map((p,i)=> (
                         <div key={`cfgm-${i}`} className="form-row">
                           <span>玩家{i+1}：</span>
@@ -1182,6 +1568,35 @@
               </div>
             )}
 
+            {showUndoConfirm && (
+              <div className="modal-backdrop" onClick={()=>setShowUndoConfirm(false)}>
+                <div className="modal" onClick={(e)=>e.stopPropagation()}>
+                  <div className="header">
+                    <div className="title">确认悔棋</div>
+                    <div className="row">
+                      <button className="btn" onClick={()=>setShowUndoConfirm(false)}>取消</button>
+                      <button className="btn accent" onClick={()=>{ if(normalHistory.length){ undoLastMove(); } else { toast.show('没有可撤回的落子'); } setShowUndoConfirm(false); }}>确认悔棋</button>
+                    </div>
+                  </div>
+                  <div className="content">
+                    {normalHistory.length ? (
+                      <div style={{lineHeight:'1.6'}}>
+                        <p style={{marginTop:0}}>将撤回最近一步落子：</p>
+                        <p>
+                          玩家：{players[normalHistory[normalHistory.length-1].pid]?.name || '玩家'}
+                          <span className="color-dot" style={{ background: (players[normalHistory[normalHistory.length-1].pid]?.color) || '#999', display:'inline-block', verticalAlign:'middle', marginLeft:8 }}></span>
+                        </p>
+                        <p>坐标：{normalHistory[normalHistory.length-1].row+1}, {normalHistory[normalHistory.length-1].col+1}</p>
+                        <p>确认后将恢复到该步玩家的回合。</p>
+                      </div>
+                    ) : (
+                      <p>没有可撤回的落子。</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {winner != null && (
               <div className="modal-backdrop" onClick={()=>{}}>
                 <div className="modal" onClick={(e)=>e.stopPropagation()}>
@@ -1200,6 +1615,30 @@
             )}
 
             {toast.msg && <div className="toast">{toast.msg}</div>}
+            
+            {/* 底部导航栏（仅游戏界面显示，简约风 + 编辑展开） */}
+            {gameMode && (
+              <div className="bottom-nav">
+                {!editOpen ? (
+                  <div className="nav-row">
+                    <button className="btn" onClick={()=>setShowRules(true)}>规则说明</button>
+                    <button className="btn" onClick={reset}>重新开始</button>
+                    {gameMode === 'normal' && normalConfig.allowUndo && (
+                      <button className="btn" onClick={()=>setShowUndoConfirm(true)} disabled={!normalHistory.length}>悔棋</button>
+                    )}
+                    <button className="btn" onClick={()=>setEditOpen(true)}>编辑</button>
+                  </div>
+                ) : (
+                  <div className="nav-row">
+                    <button className="btn" onClick={()=>setPanMode(m=>!m)}>{panMode ? '拖动：开' : '拖动：关'}</button>
+                    <button className="btn" onClick={()=>setZoom(z=>Math.min(2.5, +(z+0.2).toFixed(2)))}>放大</button>
+                    <button className="btn" onClick={()=>setZoom(z=>Math.max(0.6, +(z-0.2).toFixed(2)))}>缩小</button>
+                    <button className="btn" onClick={()=>{ setZoom(1); setPan({x:0,y:0}); }}>复位</button>
+                    <button className="btn" onClick={()=>setEditOpen(false)}>完成</button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         );
       }
